@@ -1,56 +1,76 @@
 locals {
   shared_config = nonsensitive(jsondecode(data.aws_ssm_parameter.shared_config.value))
+
+  internal_domain_name = "${var.service_name}.${local.shared_config.internal_hosted_zone_name}"
+  api_gateway_path = coalesce(var.custom_api_gateway_path, var.service_name)
 }
 
 module "general_rest_api_module" {
-  source = "github.com/nsbno/terraform-aws-rest-api?ref=rest-api"
+  # source = "github.com/nsbno/terraform-aws-rest-api?ref=rest-api"
+  source = "/Users/tomarne/repos/terraform-aws-rest-api"
 
   name = var.service_name
 
   endpoint_type = "REGIONAL"
 
-  redeployment_triggers = merge(
-    { resource_proxy_id = module.api_proxy_addon_module.recource_proxy_id },
-    { http_method       = module.api_proxy_addon_module.http_method },
-    { integration_id    = aws_api_gateway_integration.rest_service.id },
-    { type              = aws_api_gateway_integration.rest_service.type },
-    { uri               = aws_api_gateway_integration.rest_service.uri },
-    { connection_type   = aws_api_gateway_integration.rest_service.connection_type },
-    aws_api_gateway_integration.rest_service.request_parameters
-    # aws_apigatewayv2_api_mapping ?
-  )
+  redeployment_triggers = jsonencode({
+    proxy = module.api_proxy_addon_module
+  })
 }
 module "api_proxy_addon_module" {
-  source = "github.com/nsbno/terraform-aws-rest-api//modules/proxy-api?ref=rest-api"
+  # source = "github.com/nsbno/terraform-aws-rest-api//modules/proxy-api?ref=rest-api"
+  source = "/Users/tomarne/repos/terraform-aws-rest-api/modules/proxy-api"
 
   rest_api_id = module.general_rest_api_module.rest_api_id
   parent_id   = module.general_rest_api_module.root_resource_id
-  method_authorization = "NONE"
-}
+  authorization_type = "NONE"
 
-resource "aws_api_gateway_integration" "rest_service" {
-  rest_api_id             = module.general_rest_api_module.rest_api_id
-  resource_id             = module.api_proxy_addon_module.recource_proxy_id
-  http_method             = module.api_proxy_addon_module.http_method
-  type                    = "HTTP_PROXY"
-  integration_http_method = "ANY"
-  uri                     = "https://${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}/{proxy}"
-  connection_type         = "VPC_LINK"
-  connection_id           = data.aws_ssm_parameter.apigw_vpc_link_id.value
-  integration_target      = local.shared_config.lb_internal_arn
-
-  request_parameters = {
-    "integration.request.path.proxy"  = "method.request.path.proxy"
-    "integration.request.header.host" = "'${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}'"
+  
+  load_balancer_integration = {
+    load_balancer_arn    = local.shared_config.lb_internal_arn,
+    connection_id        = data.aws_ssm_parameter.apigw_vpc_link_id.value,
+    backend_uri_template = "https://${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}/{proxy}"
+    request_parameters   = {
+      "integration.request.path.proxy"  = "method.request.path.proxy"
+      "integration.request.header.host" = "'${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}'"
+    }
   }
+  
+  
+  
+  # uri = "https://${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}/{proxy}"
+  # connection_id = data.aws_ssm_parameter.apigw_vpc_link_id.value
+  # integration_target = local.shared_config.lb_internal_arn
+  
+  # request_parameters = {
+  #   "integration.request.path.proxy"  = "method.request.path.proxy"
+  #   "integration.request.header.host" = "'${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}'"
+  # }
 }
+
+# resource "aws_api_gateway_integration" "rest_service" {
+#   rest_api_id             = module.general_rest_api_module.rest_api_id
+#   resource_id             = module.api_proxy_addon_module.recource_proxy_id
+#   http_method             = module.api_proxy_addon_module.http_method
+#   type                    = "HTTP_PROXY"
+#   integration_http_method = "ANY"
+#   # uri                     = "https://${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}/{proxy}"
+#   connection_type         = "VPC_LINK"
+#   # connection_id           = data.aws_ssm_parameter.apigw_vpc_link_id.value
+#   # integration_target      = local.shared_config.lb_internal_arn
+
+#   # request_parameters = {
+#   #   "integration.request.path.proxy"  = "method.request.path.proxy"
+#   #   "integration.request.header.host" = "'${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}'"
+#   # }
+# }
 
 resource "aws_apigatewayv2_api_mapping" "service" {
   api_id      = module.general_rest_api_module.rest_api_id
   # domain_name = var.migrate_to_rest_api ? aws_apigatewayv2_domain_name.apigw.id : aws_api_gateway_domain_name.rest_apigw.domain_name
   domain_name = data.aws_ssm_parameter.apigw_domain_name_id.value
   stage       = module.general_rest_api_module.stage_name
-  api_mapping_key   = "services/${var.service_name}"
+  api_mapping_key   = "services/${local.api_gateway_path}"
 }
 
 resource "aws_wafv2_web_acl_association" "rest_service" {
