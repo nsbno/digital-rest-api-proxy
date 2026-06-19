@@ -1,5 +1,5 @@
 variable "service_name" {
-    type = string     
+  type = string
 }
 
 # variable "hosted_zone_name" {
