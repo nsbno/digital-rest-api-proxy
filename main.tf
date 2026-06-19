@@ -11,14 +11,14 @@ module "rest_api" {
   name          = var.service_name
   endpoint_type = "REGIONAL"
   redeployment_triggers = jsonencode({
-    proxy = module.api_proxy_addon_module
+    proxy = module.api_proxy_addon
   })
 }
 module "api_proxy_addon" {
   source = "github.com/nsbno/terraform-aws-rest-api//modules/proxy-api?ref=1.0.0"
 
-  rest_api_id        = module.general_rest_api_module.rest_api_id
-  parent_id          = module.general_rest_api_module.root_resource_id
+  rest_api_id        = module.general_rest_api.rest_api_id
+  parent_id          = module.general_rest_api.root_resource_id
   authorization_type = "NONE"
 
 
@@ -41,6 +41,6 @@ resource "aws_apigatewayv2_api_mapping" "service" {
 }
 
 resource "aws_wafv2_web_acl_association" "rest_service" {
-  resource_arn = module.general_rest_api_module.stage_arn
+  resource_arn = module.general_rest_api.stage_arn
   web_acl_arn  = data.aws_ssm_parameter.rest_api_waf_arn.value
 }
