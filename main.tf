@@ -5,7 +5,7 @@ locals {
   api_gateway_path     = coalesce(var.custom_api_gateway_path, var.service_name)
 }
 
-module "general_rest_api_module" {
+module "rest_api" {
   source = "github.com/nsbno/terraform-aws-rest-api?ref=1.0.0"
 
   name          = var.service_name
