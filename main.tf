@@ -34,9 +34,9 @@ module "api_proxy_addon" {
 }
 
 resource "aws_apigatewayv2_api_mapping" "service" {
-  api_id          = module.general_rest_api_module.rest_api_id
+  api_id          = module.rest_api.rest_api_id
   domain_name     = data.aws_ssm_parameter.apigw_domain_name_id.value
-  stage           = module.general_rest_api_module.stage_name
+  stage           = module.rest_api.stage_name
   api_mapping_key = "services/${local.api_gateway_path}"
 }
 
