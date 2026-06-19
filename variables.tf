@@ -5,5 +5,5 @@ variable "service_name" {
 variable "custom_api_gateway_path" {
   type        = string
   default     = null
-  description = "By default, your service will be avaialable at /services/<name>. If you set this variable, it will be available at /services/<custom_api_gateway_path> intead."
+  description = "By default, your service will be available at /services/<name>. If you set this variable, it will be available at /services/<custom_api_gateway_path> instead."
 }
