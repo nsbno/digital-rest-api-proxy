@@ -1,1 +1,2 @@
 # digital-rest-api-proxy
+Creates a REST API Gateway that proxies requests from CloudFront and main-frontend to a private subnet where backend ECS services are hosted. The REST API is protected by AWS WAF so requests from sources other than CloudFront or main-frontend are blocked. For now, this REST API exists alongside the HTTP API, and an aws_apigatewayv2_api_mapping ensures traffic is routed through the protected REST API instead of the unprotected HTTP API.
