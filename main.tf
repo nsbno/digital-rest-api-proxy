@@ -41,6 +41,8 @@ resource "aws_apigatewayv2_api_mapping" "service" {
 }
 
 resource "aws_wafv2_web_acl_association" "rest_service" {
+  count = var.waf_enabled ? 1 : 0
+
   resource_arn = module.rest_api.stage_arn
   web_acl_arn  = data.aws_ssm_parameter.rest_api_waf_arn.value
 }
