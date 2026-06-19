@@ -5,6 +5,6 @@
 # }
 
 module "digital_rest_api_proxy" {
-  source = "github.com/nsbno/digital-rest-api-proxy?ref=genesis"
+  source       = "github.com/nsbno/digital-rest-api-proxy?ref=genesis"
   service_name = my-application-name
 }
