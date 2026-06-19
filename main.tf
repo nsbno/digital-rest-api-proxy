@@ -14,7 +14,7 @@ module "rest_api" {
     proxy = module.api_proxy_addon_module
   })
 }
-module "api_proxy_addon_module" {
+module "api_proxy_addon" {
   source = "github.com/nsbno/terraform-aws-rest-api//modules/proxy-api?ref=1.0.0"
 
   rest_api_id        = module.general_rest_api_module.rest_api_id
