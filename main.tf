@@ -6,7 +6,7 @@ locals {
 }
 
 module "general_rest_api_module" {
-  source = "github.com/nsbno/terraform-aws-rest-api?ref=rest-api"
+  source = "github.com/nsbno/terraform-aws-rest-api?ref=1.0.0"
 
   name = var.service_name
 
@@ -17,7 +17,7 @@ module "general_rest_api_module" {
   })
 }
 module "api_proxy_addon_module" {
-  source = "github.com/nsbno/terraform-aws-rest-api//modules/proxy-api?ref=rest-api"
+  source = "github.com/nsbno/terraform-aws-rest-api//modules/proxy-api?ref=1.0.0"
 
   rest_api_id = module.general_rest_api_module.rest_api_id
   parent_id   = module.general_rest_api_module.root_resource_id
