@@ -8,6 +8,6 @@ locals {
 # }
 
 module "digital_rest_api_proxy" {
-  source       = "github.com/nsbno/digital-rest-api-proxy?ref=genesis"
+  source       = "github.com/nsbno/digital-rest-api-proxy?ref=1.0.0"
   service_name = local.application_name
 }
