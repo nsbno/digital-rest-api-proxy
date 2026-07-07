@@ -37,7 +37,7 @@ resource "aws_apigatewayv2_api_mapping" "service" {
   api_id          = module.rest_api.rest_api_id
   domain_name     = data.aws_ssm_parameter.apigw_domain_name_id.value
   stage           = module.rest_api.stage_name
-  api_mapping_key = "services/${local.api_gateway_path}"
+  api_mapping_key = "services/${local.api_gateway_path}/*"
 }
 
 resource "aws_wafv2_web_acl_association" "rest_service" {
