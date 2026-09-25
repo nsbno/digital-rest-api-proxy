@@ -35,3 +35,20 @@ variable "integration_request_parameters" {
   type        = map(string)
   default     = null
 }
+
+variable "response_transfer_mode" {
+  description = "Set to STREAM to let the backend stream its response (e.g. Server-Sent Events) instead of API Gateway buffering it in full before returning. STREAM raises the allowed timeout_milliseconds ceiling from 29,000ms to 900,000ms without a service quota increase."
+  type        = string
+  default     = "BUFFERED"
+
+  validation {
+    condition     = contains(["BUFFERED", "STREAM"], var.response_transfer_mode)
+    error_message = "response_transfer_mode must be BUFFERED or STREAM."
+  }
+}
+
+variable "timeout_milliseconds" {
+  description = "Integration timeout in milliseconds. Max 29,000 for BUFFERED (default; higher requires an AWS service quota increase), max 900,000 for STREAM."
+  type        = number
+  default     = 29000
+}

@@ -16,7 +16,7 @@ module "rest_api" {
   })
 }
 module "api_proxy_addon" {
-  source = "github.com/nsbno/terraform-aws-rest-api//modules/proxy-api?ref=1.1.0"
+  source = "github.com/nsbno/terraform-aws-rest-api//modules/proxy-api?ref=support-response-streaming"
 
   rest_api_id               = module.rest_api.rest_api_id
   parent_id                 = module.rest_api.root_resource_id
@@ -30,6 +30,8 @@ module "api_proxy_addon" {
       "integration.request.path.proxy"  = "method.request.path.proxy"
       "integration.request.header.host" = "'${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}'"
     }
+    response_transfer_mode = var.response_transfer_mode
+    timeout_milliseconds   = var.timeout_milliseconds
   }
 }
 
