@@ -29,3 +29,8 @@ variable "method_request_parameters" {
     "method.request.header.host" = true
   }
 }
+
+variable "integration_request_parameters" {
+  description = "Request parameters to be passed from the integration request to the backend."
+  type        = map(string)
+}

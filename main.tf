@@ -26,7 +26,7 @@ module "api_proxy_addon" {
     load_balancer_arn    = local.shared_config.lb_internal_arn,
     connection_id        = data.aws_ssm_parameter.apigw_vpc_link_id.value,
     backend_uri_template = "https://${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}/{proxy}"
-    request_parameters = {
+    request_parameters = var.integration_request_parameters != null ? var.integration_request_parameters : {
       "integration.request.path.proxy"  = "method.request.path.proxy"
       "integration.request.header.host" = "'${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}'"
     }
