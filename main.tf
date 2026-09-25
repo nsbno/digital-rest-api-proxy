@@ -6,7 +6,7 @@ locals {
 }
 
 module "rest_api" {
-  source = "github.com/nsbno/terraform-aws-rest-api?ref=1.1.0"
+  source = "github.com/nsbno/terraform-aws-rest-api?ref=1.2.0"
 
   name               = var.service_name
   endpoint_type      = "REGIONAL"
@@ -16,7 +16,7 @@ module "rest_api" {
   })
 }
 module "api_proxy_addon" {
-  source = "github.com/nsbno/terraform-aws-rest-api//modules/proxy-api?ref=support-response-streaming"
+  source = "github.com/nsbno/terraform-aws-rest-api//modules/proxy-api?ref=1.2.0"
 
   rest_api_id               = module.rest_api.rest_api_id
   parent_id                 = module.rest_api.root_resource_id
