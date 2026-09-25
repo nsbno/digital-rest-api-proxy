@@ -6,27 +6,27 @@ locals {
 }
 
 module "rest_api" {
-  source = "github.com/nsbno/terraform-aws-rest-api?ref=1.0.0"
+  source = "github.com/nsbno/terraform-aws-rest-api?ref=1.1.0"
 
-  name          = var.service_name
-  endpoint_type = "REGIONAL"
+  name               = var.service_name
+  endpoint_type      = "REGIONAL"
+  binary_media_types = var.binary_media_types
   redeployment_triggers = jsonencode({
     proxy = module.api_proxy_addon
   })
 }
 module "api_proxy_addon" {
-  source = "github.com/nsbno/terraform-aws-rest-api//modules/proxy-api?ref=1.0.0"
+  source = "github.com/nsbno/terraform-aws-rest-api//modules/proxy-api?ref=1.1.0"
 
-  rest_api_id        = module.rest_api.rest_api_id
-  parent_id          = module.rest_api.root_resource_id
-  authorization_type = "NONE"
-
-
+  rest_api_id               = module.rest_api.rest_api_id
+  parent_id                 = module.rest_api.root_resource_id
+  authorization_type        = "NONE"
+  method_request_parameters = var.method_request_parameters
   load_balancer_integration = {
     load_balancer_arn    = local.shared_config.lb_internal_arn,
     connection_id        = data.aws_ssm_parameter.apigw_vpc_link_id.value,
     backend_uri_template = "https://${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}/{proxy}"
-    request_parameters = {
+    request_parameters = var.integration_request_parameters != null ? var.integration_request_parameters : {
       "integration.request.path.proxy"  = "method.request.path.proxy"
       "integration.request.header.host" = "'${var.service_name}.${data.aws_route53_zone.internal_vydev_io_zone_name.name}'"
     }
