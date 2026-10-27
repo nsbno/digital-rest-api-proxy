@@ -12,13 +12,18 @@ variable "custom_api_gateway_path" {
 variable "waf_enabled" {
   type        = bool
   default     = true
-  description = "By default, WAF keeps the API private and only reachable from CloudFront and main-frontend. Disabling it makes the endpoint publicly available and more vulnerable to DoS attacks."
+  description = "Controls whether a WAF Web ACL is associated with the REST API stage. Defaults to true. Disabling it skips WAF association entirely, even if web_acl_arn is set."
 }
 
 variable "web_acl_arn" {
   type        = string
   default     = null
-  description = "ARN of a custom WAF Web ACL to associate with the REST API stage. If omitted, the shared digitalekanaler REST API WAF is used."
+  description = "ARN of a custom WAF Web ACL to associate with the REST API stage. Requires waf_enabled = true. If omitted, the shared digitalekanaler REST API WAF is used."
+
+  validation {
+    condition     = var.waf_enabled || var.web_acl_arn == null
+    error_message = "web_acl_arn cannot be set when waf_enabled is false."
+  }
 }
 
 variable "binary_media_types" {
