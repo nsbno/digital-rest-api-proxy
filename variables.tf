@@ -15,6 +15,12 @@ variable "waf_enabled" {
   description = "By default, WAF keeps the API private and only reachable from CloudFront and main-frontend. Disabling it makes the endpoint publicly available and more vulnerable to DoS attacks."
 }
 
+variable "web_acl_arn" {
+  type        = string
+  default     = null
+  description = "ARN of a custom WAF Web ACL to associate with the REST API stage. If omitted, the shared digitalekanaler REST API WAF is used."
+}
+
 variable "binary_media_types" {
   description = "MIME types that API Gateway should treat as binary data."
   type        = list(string)
