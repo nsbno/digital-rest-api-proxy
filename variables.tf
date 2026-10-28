@@ -12,7 +12,7 @@ variable "custom_api_gateway_path" {
 variable "waf_enabled" {
   type        = bool
   default     = true
-  description = "By default, WAF keeps the API private and only reachable from CloudFront and main-frontend. Disabling it makes the endpoint publicly available and more vulnerable to DoS attacks."
+  description = "By default, WAF keeps the API private and only reachable from CloudFront and main-frontend. Disabling it makes the endpoint publicly available and more vulnerable to DoS attacks unless you associate your own WAF Web ACL via stage_arn."
 }
 
 variable "binary_media_types" {
